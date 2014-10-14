@@ -1,4 +1,5 @@
-"""experiments.py calls the downloadAccelerator.py script to download files of several different sizes using a variable number of threads"""
+"""experiments.py calls the downloadAccelerator.py script to download 
+files of several different sizes using a variable number of threads"""
 import os
 import sys
 

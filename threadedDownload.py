@@ -1,4 +1,5 @@
-"""threadedDownload.py creates a separate thread to download each URL in parallel"""
+"""threadedDownload.py creates a separate thread to download each
+ URL in parallel"""
 import argparse
 import os
 import requests

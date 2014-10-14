@@ -1,4 +1,5 @@
-"""threadHello.py shows how to create a set of threads that print a message and their thread ID."""
+"""threadHello.py shows how to create a set of threads that print
+ a message and their thread ID."""
 import argparse
 import sys
 import threading
