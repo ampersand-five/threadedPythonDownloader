@@ -72,9 +72,18 @@ class downloadAccelerator:#(threading.Thread):
 			t.join()
 
 		#clock timer
-		end_time = time.time()-start_time
+		self.seconds = time.time()-start_time
 
 	"""Output: [URL] [#Threads] [bytes] [seconds]"""
+
+	print self.url + " " + self.threads + " " + self.bytes + " " + self.seconds
+
+
+
+
+
+
+
 
 
 
