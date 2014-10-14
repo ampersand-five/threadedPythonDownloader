@@ -1,4 +1,5 @@
-"""download.py Downloads a set of URLs, located in urls.txt, and stores them in a directory called downloads."""
+"""download.py Downloads a set of URLs, located in urls.txt, 
+and stores them in a directory called downloads."""
 import argparse
 import os
 import requests
