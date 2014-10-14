@@ -4,7 +4,7 @@ import threading
 import requests
 import os
 import urlparse
-
+import time
 
 """called with three strings: threads, url
 Output: [URL] [#Threads] [bytes] [seconds]"""
@@ -21,8 +21,10 @@ class downloadAccelerator:#(threading.Thread):
 		self.parse_arguments()
 		self.seconds = 0.0
 		self.bytes = 0
-		self.sem = threading.Semaphore()
-		self.sem = threading.Lock()
+		#parse arguments
+		self.parse_arguments()
+		#start download
+		self.download()
 
 	"""Parse Command line arguments"""
 	def parse_arguments(self):
@@ -60,6 +62,8 @@ class downloadAccelerator:#(threading.Thread):
 			#add thread to thread array
 			threads.append(d)
 
+		#start timer
+		start_time = time.time()
 		#start the threads
 		for t in threads:
 			t.start()
@@ -67,6 +71,8 @@ class downloadAccelerator:#(threading.Thread):
 		for t in threads:
 			t.join()
 
+		#clock timer
+		end_time = time.time()-start_time
 
 	"""Output: [URL] [#Threads] [bytes] [seconds]"""
 
@@ -79,7 +85,9 @@ class DownloadThread(threading.Thread):
 		self.url = url
 		self.file_name = file_name
 		threading.Thread.__init__(self)
-		self.consumed = False
+		#? self.consumed = False
+		self.sem = threading.Semaphore()
+		self.sem = threading.Lock()
 
 	
 	def run(self):
@@ -87,6 +95,12 @@ class DownloadThread(threading.Thread):
 		headers = { "Range" : "bytes=%s,%s" % (startByte, endByte), "Accept-Encoding" : "identity"}
 		r = requests.get(url, headers=headers)
 		
-		#? 'wb'?
+
+
+	def write(self):
+		#? does this lock the file so only one thread writes?
+		self.sem.acquire()
+		#? write binary
 		with open(self.file_name, 'wb') as f:
 			f.write(r.content)
+		self.sem.release()
