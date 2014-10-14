@@ -16,7 +16,7 @@ class downloadAccelerator:#(threading.Thread):
 		#threading.Thread.__init__(self)
 		self.args = None
 		self.threads = 5
-		self.file_name = 'index.html'
+		self.file_name = ""
 		self.url = ""
 		self.parse_arguments()
 		self.seconds = 0.0
@@ -25,6 +25,7 @@ class downloadAccelerator:#(threading.Thread):
 		self.parse_arguments()
 		#start download
 		self.download()
+		self.print_out()
 
 	"""Parse Command line arguments"""
 	def parse_arguments(self):
@@ -42,12 +43,15 @@ class downloadAccelerator:#(threading.Thread):
 		#get URL
 		self.url = args.URL
 		#get file storage location from URL
-		#this doesn't get the last item in URL like I think, right?
-		#self.file_name = (args.URL).split('/')[-1].strip()
+		#split the string according to '/' delim and get the last in the array
+		self.file_name = (args.URL).split('/')[-1].strip()
+		#if an empty string then make it index.html for the file name
+		if self.file_name == "":
+			self.file_name = "index.html"
 
 		#? Does what exactly: what's the file path it follows?
-		if not os.path.exists(self.URL):
-			os.makedirs(self.URL)
+		#if not os.path.exists(self.URL):
+		#	os.makedirs(self.URL)
 
 
 
@@ -70,13 +74,15 @@ class downloadAccelerator:#(threading.Thread):
 		#?
 		for t in threads:
 			t.join()
+			t.write()
 
 		#clock timer
 		self.seconds = time.time()-start_time
 
-	"""Output: [URL] [#Threads] [bytes] [seconds]"""
+	def print_out(self):
 
-	print self.url + " " + self.threads + " " + self.bytes + " " + self.seconds
+		"""Output: [URL] [#Threads] [bytes] [seconds]"""
+		print self.url," ",self.threads," ",self.bytes," ",self.seconds
 
 
 
@@ -94,22 +100,20 @@ class DownloadThread(threading.Thread):
 		self.url = url
 		self.file_name = file_name
 		threading.Thread.__init__(self)
-		#? self.consumed = False
-		self.sem = threading.Semaphore()
-		self.sem = threading.Lock()
+		self.start_byte = ""
+		self.end_byte = ""
+		self.req
+		self.run()
 
 	
 	def run(self):
 		#?
-		headers = { "Range" : "bytes=%s,%s" % (startByte, endByte), "Accept-Encoding" : "identity"}
-		r = requests.get(url, headers=headers)
+		headers = { "Range" : "bytes=%s,%s" % (start_byte, end_byte), "Accept-Encoding" : "identity"}
+		req = requests.get(url, headers=headers)
 		
 
 
 	def write(self):
-		#? does this lock the file so only one thread writes?
-		self.sem.acquire()
 		#? write binary
 		with open(self.file_name, 'wb') as f:
-			f.write(r.content)
-		self.sem.release()
+			f.write(req.content)
