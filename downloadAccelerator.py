@@ -58,6 +58,9 @@ class downloadAccelerator:#(threading.Thread):
 
 	"""Download file"""
 	def download(self):
+
+		response = requests.header(self.url)
+
 		threads = []
 		#make however many threads were specified
 		for i in range(0,self.threads):
