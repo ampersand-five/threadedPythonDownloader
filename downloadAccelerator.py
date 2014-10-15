@@ -5,6 +5,7 @@ import requests
 import os
 import urlparse
 import time
+import wget
 
 """called with three strings: threads, url
 Output: [URL] [#Threads] [bytes] [seconds]"""
@@ -20,22 +21,17 @@ class downloadAccelerator:#(threading.Thread):
 		self.url = ""
 		self.seconds = 0.0
 		self.bytes = 0
-		#parse arguments
-		self.parse_arguments()
-		#start download
-		self.download()
-		self.print_out()
+
 
 	"""Parse Command line arguments"""
 	def parse_arguments(self):
-		print "PARSING ARGUMENTS!"
-		sys.stdout.write("PARSING ARGUMENTS!")
+		#print "PARSING ARGUMENTS!"
 		#setup parser
 		parser = argparse.ArgumentParser()
 		#add parse for # of threads
 		parser.add_argument('-n', '--number', type = int, action = 'store')
 		#add parse for URL
-		parser.add_argument('url', '--URL', metavar = 'URL', type = str, action = 'store')
+		parser.add_argument('url',type = str, action = 'store')
 
 		
 		#actually parse arguments
@@ -43,13 +39,14 @@ class downloadAccelerator:#(threading.Thread):
 		#get the # of threads
 		self.threads = args.number
 		#get URL
-		self.url = args.URL
+		self.url = args.url
 		#get file storage location from URL
 		#split the string according to '/' delim and get the last in the array
-		self.file_name = (args.URL).split('/')[-1].strip()
+		self.file_name = (args.url).split('/')[-1].strip()
 		#if an empty string then make it index.html for the file name
 		if self.file_name == "":
 			self.file_name = "index.html"
+		#print self.file_name
 
 		#? Does what exactly: what's the file path it follows?
 		#if not os.path.exists(self.URL):
@@ -61,48 +58,54 @@ class downloadAccelerator:#(threading.Thread):
 	"""Download file"""
 	def download(self):
 
-		response = requests.header(self.url)
+		response = requests.head(self.url)
 		self.bytes = response.headers["content-length"]
-		bytes_per_thread = self.bytes/self.threads
+		bytes_per_thread = int(self.bytes)/self.threads
 
 		#check if division wasn't clean and needs a some more bytes
 		#for last run through
 		add_bytes_at_end = 0
-		if (self.bytes%self.threads) != 0:
-			add_bytes_at_end = self.bytes%self.threads
+		if (int(self.bytes)%self.threads) != 0:
+			add_bytes_at_end = int(self.bytes)%self.threads
 
 		#starting byte for each thread
 		start_byte = 0
 		threads_array = []
+		#print "FOR LOOP",len(threads_array)
 		#make however many threads were specified
-		for i in range(0,self.threads_array):
+		for i in range(0,self.threads):
 			#check if we're on the last thread and add extra bytes
-			if i == (len(self.threads_array) - 1):
+			if i == (self.threads - 1):
 				bytes_per_thread = bytes_per_thread + add_bytes_at_end
 			#make thread
-			d = DownloadThread(url, file_name, start_byte, bytes_per_thread)
+			d = DownloadThread(self.url, self.file_name, start_byte, bytes_per_thread)
+			#print "\nthread",i,"\nstart_byte:",start_byte,"end_byte:",(bytes_per_thread+start_byte)
 			#add to start_byte so next one starts at correct location
 			start_byte = start_byte + bytes_per_thread
 			#add thread to thread array
 			threads_array.append(d)
-
+		
 		#start timer
 		start_time = time.time()
-		#start the threads
-		for t in threads_array:
-			t.start()
-		#?
-		for t in threads_array:
-			t.join()
-			t.write()
 
-		#clock timer
+		with open(self.file_name, 'wb') as f:
+			#start the threads
+			for t in threads_array:
+				t.start()
+			#
+			for t in threads_array:
+				t.join()
+				f.write(t.content)
+
+		#stop timer
 		self.seconds = time.time()-start_time
 
 	def print_out(self):
 
 		"""Output: [URL] [#Threads] [bytes] [seconds]"""
 		print self.url," ",self.threads," ",self.bytes," ",self.seconds
+
+
 
 
 
@@ -122,21 +125,35 @@ class DownloadThread(threading.Thread):
 		threading.Thread.__init__(self)
 		self.start_byte = start_byte
 		self.bytes = bytes_total
-		self.response
+		self.content = None
 		self.run()
 
 	
 	def run(self):
 		#make range
-		end_byte = self.start_byte + bytes
+		end_byte = self.start_byte + self.bytes
 
-		#?
+		#
 		headers = { "Range" : "bytes=%s,%s" % (self.start_byte, end_byte), "Accept-Encoding" : "identity"}
-		response = requests.get(url, headers=headers)
+		response = requests.get(self.url, headers = headers)
+		self.content = response.content
+
 		
 
 
-	def write(self):
-		#? write binary
+"""	def write(self):
+		#
 		with open(self.file_name, 'wb') as f:
-			f.write(response.content)
+			f.write(response.content)"""
+
+
+
+
+if __name__ == '__main__':
+	#initialize Object
+	download = downloadAccelerator()
+	#parse arguments
+	download.parse_arguments()
+	#start download
+	download.download()
+	download.print_out()
