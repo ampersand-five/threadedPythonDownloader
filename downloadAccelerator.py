@@ -18,7 +18,6 @@ class downloadAccelerator:#(threading.Thread):
 		self.threads = 5
 		self.file_name = ""
 		self.url = ""
-		self.parse_arguments()
 		self.seconds = 0.0
 		self.bytes = 0
 		#parse arguments
@@ -29,12 +28,15 @@ class downloadAccelerator:#(threading.Thread):
 
 	"""Parse Command line arguments"""
 	def parse_arguments(self):
+		print "PARSING ARGUMENTS!"
+		sys.stdout.write("PARSING ARGUMENTS!")
 		#setup parser
 		parser = argparse.ArgumentParser()
 		#add parse for # of threads
 		parser.add_argument('-n', '--number', type = int, action = 'store')
 		#add parse for URL
 		parser.add_argument('url', '--URL', metavar = 'URL', type = str, action = 'store')
+
 		
 		#actually parse arguments
 		args = parser.parse_args()
@@ -60,22 +62,37 @@ class downloadAccelerator:#(threading.Thread):
 	def download(self):
 
 		response = requests.header(self.url)
+		self.bytes = response.headers["content-length"]
+		bytes_per_thread = self.bytes/self.threads
 
-		threads = []
+		#check if division wasn't clean and needs a some more bytes
+		#for last run through
+		add_bytes_at_end = 0
+		if (self.bytes%self.threads) != 0:
+			add_bytes_at_end = self.bytes%self.threads
+
+		#starting byte for each thread
+		start_byte = 0
+		threads_array = []
 		#make however many threads were specified
-		for i in range(0,self.threads):
+		for i in range(0,self.threads_array):
+			#check if we're on the last thread and add extra bytes
+			if i == (len(self.threads_array) - 1):
+				bytes_per_thread = bytes_per_thread + add_bytes_at_end
 			#make thread
-			d = DownloadThread(url, file_name)
+			d = DownloadThread(url, file_name, start_byte, bytes_per_thread)
+			#add to start_byte so next one starts at correct location
+			start_byte = start_byte + bytes_per_thread
 			#add thread to thread array
-			threads.append(d)
+			threads_array.append(d)
 
 		#start timer
 		start_time = time.time()
 		#start the threads
-		for t in threads:
+		for t in threads_array:
 			t.start()
 		#?
-		for t in threads:
+		for t in threads_array:
 			t.join()
 			t.write()
 
@@ -99,24 +116,27 @@ class downloadAccelerator:#(threading.Thread):
 """Downloading Threaded Class"""
 class DownloadThread(threading.Thread):
 	#Constructor
-	def __init__(self, url, file_name):
+	def __init__(self, url, file_name, start_byte, bytes_total):
 		self.url = url
 		self.file_name = file_name
 		threading.Thread.__init__(self)
-		self.start_byte = ""
-		self.end_byte = ""
-		self.req
+		self.start_byte = start_byte
+		self.bytes = bytes_total
+		self.response
 		self.run()
 
 	
 	def run(self):
+		#make range
+		end_byte = self.start_byte + bytes
+
 		#?
-		headers = { "Range" : "bytes=%s,%s" % (start_byte, end_byte), "Accept-Encoding" : "identity"}
-		req = requests.get(url, headers=headers)
+		headers = { "Range" : "bytes=%s,%s" % (self.start_byte, end_byte), "Accept-Encoding" : "identity"}
+		response = requests.get(url, headers=headers)
 		
 
 
 	def write(self):
 		#? write binary
 		with open(self.file_name, 'wb') as f:
-			f.write(req.content)
+			f.write(response.content)
