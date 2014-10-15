@@ -48,3 +48,14 @@ http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   10   100
 http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   10   1003157   0.322868108749
 http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   10   1003157   0.333661079407
 http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   10   1003157   0.337079048157
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.369761943817
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.300245046616
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.238280057907
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.283795118332
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.237910032272
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.300462961197
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.283717155457
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.245525121689
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.268580913544
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   1   1003157   0.313796043396
+http://www2.census.gov/geo/tiger/TIGER2013/TRACT/tl_2013_10_tract.zip   2   1003157   0.592662811279

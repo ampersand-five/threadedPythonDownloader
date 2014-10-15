@@ -5,7 +5,7 @@ import requests
 import os
 import urlparse
 import time
-import wget
+#import wget
 
 """called with three strings: threads, url
 Output: [URL] [#Threads] [bytes] [seconds]"""
@@ -88,17 +88,20 @@ class downloadAccelerator:#(threading.Thread):
 		#start timer
 		start_time = time.time()
 
-		with open(self.file_name, 'wb') as f:
-			#start the threads
-			for t in threads_array:
-				t.start()
-			#
-			for t in threads_array:
-				t.join()
-				f.write(t.content)
+
+		#start the threads
+		for t in threads_array:
+			t.start()
+		#
+		for t in threads_array:
+			t.join()
+
 
 		#stop timer
 		self.seconds = time.time()-start_time
+
+		with open(self.file_name, 'wb') as f:
+			f.write(t.content)
 
 	def print_out(self):
 
@@ -134,7 +137,7 @@ class DownloadThread(threading.Thread):
 		end_byte = self.start_byte + self.bytes
 
 		#
-		headers = { "Range" : "bytes=%s,%s" % (self.start_byte, end_byte), "Accept-Encoding" : "identity"}
+		headers = { "Range" : "bytes=%s-%s" % (self.start_byte, end_byte), "Accept-Encoding" : "identity"}
 		response = requests.get(self.url, headers = headers)
 		self.content = response.content
 
