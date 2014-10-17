@@ -66,7 +66,7 @@ class downloadAccelerator:#(threading.Thread):
 		#for last run through
 		add_bytes_at_end = 0
 		if (int(self.bytes)%self.threads) != 0:
-			add_bytes_at_end = int(self.bytes)%self.threads
+			add_bytes_at_end = int(self.bytes)%self.threads + 1
 
 		#starting byte for each thread
 		start_byte = 0
@@ -79,7 +79,7 @@ class downloadAccelerator:#(threading.Thread):
 				bytes_per_thread = bytes_per_thread + add_bytes_at_end
 			#make thread
 			d = DownloadThread(self.url, self.file_name, start_byte, bytes_per_thread)
-			#print "\nthread",i,"\nstart_byte:",start_byte,"end_byte:",(bytes_per_thread+start_byte)
+			#print "\nthread",i
 			#add to start_byte so next one starts at correct location
 			start_byte = start_byte + bytes_per_thread
 			#add thread to thread array
@@ -101,7 +101,8 @@ class downloadAccelerator:#(threading.Thread):
 		self.seconds = time.time()-start_time
 
 		with open(self.file_name, 'wb') as f:
-			f.write(t.content)
+			for t in threads_array:
+				f.write(t.content)
 
 	def print_out(self):
 
@@ -134,12 +135,14 @@ class DownloadThread(threading.Thread):
 	
 	def run(self):
 		#make range
-		end_byte = self.start_byte + self.bytes
+		end_byte = self.start_byte + self.bytes - 1
 
-		#
+		#print "\nstart_byte:",self.start_byte,"end_byte:",end_byte,"\n"
+
 		headers = { "Range" : "bytes=%s-%s" % (self.start_byte, end_byte), "Accept-Encoding" : "identity"}
 		response = requests.get(self.url, headers = headers)
 		self.content = response.content
+	
 
 		
 
